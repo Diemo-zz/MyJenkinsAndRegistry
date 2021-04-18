@@ -3,14 +3,14 @@ services:
   jenkins:
     build:
       context: .
-    image: jenkins/jenkins:lts
+    image: diarmaid-jenkins
     privileged: true
     user: root
     ports:
       - 50000:50000
     container_name: jenkins
     volumes:
-      - ./jenkins:/var/jenkins_home
+      - ~/jenkins:/var/jenkins_home
      dockerfile: ./Dockerfile
     deploy:
       labels:
