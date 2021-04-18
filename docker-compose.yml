@@ -1,0 +1,47 @@
+version: '3.7'
+services:
+  jenkins:
+    build:
+      context: .
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    ports:
+      - 50000:50000
+    container_name: jenkins
+    volumes:
+      - ./jenkins:/var/jenkins_home
+     dockerfile: ./Dockerfile
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.constraint-label-stack=diarmaiddeburca-de
+        - traefik.docker.network=traefik-public
+        - traefik.http.routers.diarmaiddeburca-jenkins-http.rule=Host(`jenkins.diarmaiddeburca.de`)
+        - traefik.http.routers.diarmaiddeburca-jenkins-http.entrypoints=http
+        - traefik.http.routers.diarmaiddeburca-jenkins-http.middlewares=https-redirect
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        - traefik.http.routers.diarmaiddeburca-jenkins-https.rule=Host(`jenkins.diarmaiddeburca.de`)
+        - traefik.http.routers.diarmaiddeburca-jenkins-https.entrypoints=https
+        - traefik.http.routers.diarmaiddeburca-jenkins-https.tls=true
+        - traefik.http.routers.diarmaiddeburca-jenkins-https.tls.certresolver=le
+        - traefik.http.services.diarmaiddeburca-jenkins-https.loadbalancer.server.port=8080
+  diarmaid-registry:
+    image: registry:2
+    dockerfile: ./Dockerfile
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.constraint-label-stack=diarmaiddeburca-de
+        - traefik.docker.network=traefik-public
+        - traefik.http.routers.diarmaiddeburca-fortran-http.rule=Host(`registry.diarmaiddeburca.de`)
+        - traefik.http.routers.diarmaiddeburca-fortran-http.entrypoints=http
+        - traefik.http.routers.diarmaiddeburca-fortran-http.middlewares=https-redirect
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        - traefik.http.routers.diarmaiddeburca-fortran-https.rule=Host(`registry.diarmaiddeburca.de`)
+        - traefik.http.routers.diarmaiddeburca-fortran-https.entrypoints=https
+        - traefik.http.routers.diarmaiddeburca-fortran-https.tls=true
+        - traefik.http.routers.diarmaiddeburca-fortran-https.tls.certresolver=le
+        - traefik.http.services.diarmaiddeburca-fortran-https.loadbalancer.server.port=80
